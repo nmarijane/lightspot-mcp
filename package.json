@@ -1,0 +1,47 @@
+{
+  "name": "@lightspot/mcp",
+  "version": "0.4.1",
+  "description": "MCP server for LightSpot.ai — run SEO & GEO audits, read results, and import editorial calendars.",
+  "type": "module",
+  "bin": {
+    "lightspot-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "modelcontextprotocol",
+    "seo",
+    "geo",
+    "generative-engine-optimization",
+    "ai-search",
+    "lightspot"
+  ],
+  "license": "MIT",
+  "homepage": "https://lightspot.ai",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nmarijane/lightspot-mcp"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^6.0.0"
+  },
+  "mcpName": "io.github.nmarijane/lightspot-mcp",
+  "bugs": {
+    "url": "https://github.com/nmarijane/lightspot-mcp/issues"
+  }
+}

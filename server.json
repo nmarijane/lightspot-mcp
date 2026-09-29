@@ -1,0 +1,38 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.nmarijane/lightspot-mcp",
+  "title": "LightSpot",
+  "description": "Audit a website for SEO and AI search visibility (ChatGPT, Perplexity, Gemini) and read the fixes.",
+  "websiteUrl": "https://lightspot.ai",
+  "repository": {
+    "url": "https://github.com/nmarijane/lightspot-mcp",
+    "source": "github"
+  },
+  "version": "0.4.1",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@lightspot/mcp",
+      "version": "0.4.1",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "LIGHTSPOT_API_KEY",
+          "description": "LightSpot API key (lspai_live_…), created in the LightSpot app",
+          "isRequired": true,
+          "isSecret": true,
+          "format": "string"
+        },
+        {
+          "name": "LIGHTSPOT_BASE_URL",
+          "description": "Optional API base URL, defaults to https://lightspot.ai",
+          "isRequired": false,
+          "isSecret": false,
+          "format": "string"
+        }
+      ]
+    }
+  ]
+}
