@@ -140,7 +140,7 @@ function summarizeExpertReport(r: ApiExpertReport) {
   };
 }
 
-const server = new McpServer({ name: "lightspot", version: "0.4.1" });
+const server = new McpServer({ name: "lightspot", version: "0.5.0" });
 
 server.registerTool(
   "audit_and_wait",
@@ -225,7 +225,7 @@ server.registerTool(
   "list_sites",
   {
     title: "List your sites",
-    description: "Liste paginée des sites enregistrés sur votre compte LightSpot (avec leur dernier score).",
+    description: "Liste paginée des sites de votre équipe LightSpot (avec leur dernier score).",
     inputSchema: {
       limit: z.number().int().min(1).max(100).optional().describe("Taille de page (défaut 50)."),
       offset: z.number().int().min(0).optional().describe("Décalage de pagination."),

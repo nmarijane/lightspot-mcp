@@ -46,7 +46,7 @@ Add the server to your MCP client config and set your API key:
 | `run_audit` | Start an audit without waiting (returns the audit id). |
 | `get_audit_status` | Lightweight status of an audit (`PENDING`/`RUNNING`/`DONE`/`FAILED` + progress 0–1). |
 | `get_audit` | Audit results — a trimmed summary by default, or the full payload with `full: true`. |
-| `list_sites` | List the sites on your account (with their latest score). |
+| `list_sites` | List the sites in your team (with their latest score). |
 | `get_site` | A site's metadata and recent audits. |
 | `list_site_audits` | A site's paginated audit history. |
 | `get_competitors` | Get a site's latest competitor analysis (detected competitors, tiers, citations, recommendations). Read-only — does not trigger a new analysis. |
