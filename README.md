@@ -40,6 +40,10 @@ Add the server to your MCP client config and set your API key:
 | `LIGHTSPOT_API_KEY` | yes | Your API key (`lspai_live_…`). |
 | `LIGHTSPOT_BASE_URL` | no | Override the API base URL (defaults to `https://lightspot.ai`). For self-hosted/testing only. |
 
+### Claude plugin
+
+The [`plugin/`](plugin) folder packages this server as a Claude plugin: it pins `@lightspot/mcp`, asks for your API key once and stores it in your system's secure credential store, and adds an `ai-visibility-audit` skill. See [`plugin/README.md`](plugin/README.md).
+
 ## Tools
 
 | Tool | What it does |
