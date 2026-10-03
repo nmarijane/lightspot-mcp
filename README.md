@@ -1,5 +1,7 @@
 # @lightspot/mcp
 
+[![M8ven Score](https://m8ven.ai/badge/mcp/nmarijane-lightspot-mcp-1m6lay)](https://m8ven.ai/mcp/nmarijane-lightspot-mcp-1m6lay?s=readme)
+
 MCP server for [LightSpot.ai](https://lightspot.ai) — run **SEO & GEO audits**, read their results and our experts' reports, and import editorial calendars from any MCP client (Claude Desktop, Claude Code, Cursor, …).
 
 It wraps the LightSpot public API (`/v1`) as MCP tools, so an AI assistant can *"audit this site and tell me why ChatGPT doesn't cite it"* in one step.
