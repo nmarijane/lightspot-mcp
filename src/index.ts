@@ -140,12 +140,19 @@ function summarizeExpertReport(r: ApiExpertReport) {
   };
 }
 
-const server = new McpServer({ name: "lightspot", version: "0.5.0" });
+// Annotations des outils (titre + readOnlyHint/destructiveHint) : exigées par
+// l'annuaire des connecteurs de Claude, et lues par les clients MCP pour
+// décider quand demander une confirmation. Lecture seule = aucun effet de bord ;
+// les audits écrivent (ils consomment du quota) et sortent sur le web
+// (openWorld) ; l'import de calendrier est idempotent mais écrase un créneau
+// existant de même externalId (destructive).
+const server = new McpServer({ name: "lightspot", version: "0.5.1" });
 
 server.registerTool(
   "audit_and_wait",
   {
     title: "Audit a URL and wait for the result",
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true },
     description:
       "Lance un audit SEO & GEO LightSpot sur une URL, attend la fin, et renvoie un résumé (score, top actions, principaux problèmes). " +
       "Idéal pour « audite ce site et dis-moi quoi corriger ». Peut prendre 1 à 3 minutes ; au-delà du délai, renvoie l'id pour suivre via get_audit_status / get_audit.",
@@ -182,6 +189,7 @@ server.registerTool(
   "run_audit",
   {
     title: "Start an audit (non-blocking)",
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true },
     description:
       "Démarre un audit SEO & GEO sur une URL sans attendre. Renvoie l'id et le statut. Utilisez get_audit_status pour suivre, get_audit pour les résultats.",
     inputSchema: {
@@ -197,6 +205,7 @@ server.registerTool(
   "get_audit_status",
   {
     title: "Get audit status",
+    annotations: { readOnlyHint: true, openWorldHint: false },
     description: "Statut léger d'un audit (PENDING/RUNNING/DONE/FAILED) avec une progression de 0 à 1.",
     inputSchema: { id: z.string().describe("Identifiant de l'audit.") },
   },
@@ -207,6 +216,7 @@ server.registerTool(
   "get_audit",
   {
     title: "Get audit results",
+    annotations: { readOnlyHint: true, openWorldHint: false },
     description:
       "Récupère les résultats d'un audit : résumé par défaut (score, top actions, principaux problèmes), ou payload complet avec full=true (toutes les pages et tous les problèmes).",
     inputSchema: {
@@ -225,6 +235,7 @@ server.registerTool(
   "list_sites",
   {
     title: "List your sites",
+    annotations: { readOnlyHint: true, openWorldHint: false },
     description: "Liste paginée des sites de votre équipe LightSpot (avec leur dernier score).",
     inputSchema: {
       limit: z.number().int().min(1).max(100).optional().describe("Taille de page (défaut 50)."),
@@ -238,6 +249,7 @@ server.registerTool(
   "get_site",
   {
     title: "Get a site",
+    annotations: { readOnlyHint: true, openWorldHint: false },
     description: "Métadonnées d'un site et ses audits récents.",
     inputSchema: { id: z.string().describe("Identifiant du site.") },
   },
@@ -248,6 +260,7 @@ server.registerTool(
   "list_site_audits",
   {
     title: "List a site's audit history",
+    annotations: { readOnlyHint: true, openWorldHint: false },
     description: "Historique paginé des audits d'un site.",
     inputSchema: {
       id: z.string().describe("Identifiant du site."),
@@ -262,6 +275,7 @@ server.registerTool(
   "get_competitors",
   {
     title: "Get a site's competitor analysis",
+    annotations: { readOnlyHint: true, openWorldHint: false },
     description:
       "Récupère la dernière analyse concurrentielle existante d'un site (concurrents détectés, tiers, citations, recommandations). " +
       'Ne déclenche PAS de nouvelle analyse — si aucune n\'a encore été lancée depuis l\'app, renvoie status: "NONE".',
@@ -275,6 +289,7 @@ server.registerTool(
   "get_expert_report",
   {
     title: "Get a site's expert report",
+    annotations: { readOnlyHint: true, openWorldHint: false },
     description:
       "Récupère le dernier rapport de nos 8 experts (SEO technique, qualité éditoriale, SEO/GEO, données structurées, sitemaps, performance, analyse visuelle, autorité de marque) produit après un audit d'un site : " +
       "constats priorisés, actions recommandées avec leurs étapes, limites et artefacts prêts à appliquer (JSON-LD, sitemap…). " +
@@ -304,6 +319,7 @@ server.registerTool(
   "get_editorial_calendar",
   {
     title: "Read a site's editorial calendar",
+    annotations: { readOnlyHint: true, openWorldHint: false },
     description:
       "Lit le calendrier éditorial LightSpot d'un site sur une période : créneaux importés, contenus en préparation, planifiés ou publiés, et prochaines exécutions autopilot.",
     inputSchema: {
@@ -324,6 +340,7 @@ server.registerTool(
   "create_editorial_calendar",
   {
     title: "Create or update an editorial calendar",
+    annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: false },
     description:
       "Importe jusqu'à 50 créneaux éditoriaux datés dans le calendrier d'un site LightSpot. " +
       "L'import est idempotent : externalId permet de mettre un créneau à jour sans doublon. " +
