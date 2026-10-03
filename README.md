@@ -8,7 +8,7 @@ It wraps the LightSpot public API (`/v1`) as MCP tools, so an AI assistant can *
 
 ## Requirements
 
-- A LightSpot **API key** (`lspai_live_…`) — create one in **LightSpot → Integrations → API keys**. API access is included in the **Zenith** plan.
+- A LightSpot **API key** (`lspai_live_…`) — create one in **LightSpot → Integrations → API keys**. API access is included in the **Eclat** and **Zenith** plans.
 - Node.js ≥ 18 (run on demand via `npx`, nothing to install globally).
 
 ## Setup
@@ -55,7 +55,7 @@ The [`plugin/`](plugin) folder packages this server as a Claude plugin: it pins 
 | `list_sites` | List the sites in your team (with their latest score). |
 | `get_site` | A site's metadata and recent audits. |
 | `list_site_audits` | A site's paginated audit history. |
-| `get_competitors` | Get a site's latest competitor analysis (detected competitors, tiers, citations, recommendations). Read-only — does not trigger a new analysis. |
+| `get_competitors` | Get a site's latest competitor analysis (detected competitors, tiers, citations, recommendations). Read-only — does not trigger a new analysis. Requires the Zenith plan. |
 | `get_expert_report` | Read the latest report from our 8 experts (technical SEO, content, GEO, structured data, sitemaps, performance, visual, brand authority) for a site or a given audit: prioritized findings, recommended actions with steps, limitations and ready-to-apply artifacts. Summary by default, `full: true` for everything, `expert` to read one chapter. Read-only — does not trigger an analysis. |
 | `get_editorial_calendar` | Read a site's calendar over an ISO date range, including imported slots and content already preparing, scheduled, or published. |
 | `create_editorial_calendar` | Import or update up to 50 dated editorial slots. Idempotent with `externalId`; it does not generate or publish content. |

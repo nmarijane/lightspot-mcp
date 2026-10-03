@@ -10,7 +10,7 @@ Ask Claude things like:
 
 ## Requirements
 
-- A LightSpot account on the **Zenith** plan, which includes API access
+- A LightSpot account on the **Eclat** or **Zenith** plan, which include API access
 - A LightSpot API key (`lspai_live_…`), created in **LightSpot → Integrations → API keys**. Claude asks for it when you enable the plugin and stores it in your system's secure credential store
 - Node.js 18 or later, used to run the server with `npx`
 
@@ -27,7 +27,7 @@ Ask Claude things like:
 | `run_audit` | Starts an audit without waiting. Uses one audit from your quota |
 | `get_audit_status`, `get_audit` | Read an audit's progress and results |
 | `list_sites`, `get_site`, `list_site_audits` | Read your LightSpot sites and their audit history |
-| `get_competitors` | Reads the latest competitor analysis of a site |
+| `get_competitors` | Reads the latest competitor analysis of a site (Zenith plan) |
 | `get_expert_report` | Reads the latest report from LightSpot's experts |
 | `get_editorial_calendar` | Reads a site's editorial calendar |
 | `create_editorial_calendar` | Writes up to 50 planned content slots to a site's calendar. Re-importing a slot with the same `externalId` replaces it |
