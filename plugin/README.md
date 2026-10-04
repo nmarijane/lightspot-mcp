@@ -16,7 +16,7 @@ Ask Claude things like:
 
 ## What the plugin contains
 
-- **An MCP server**, `@lightspot/mcp`, pinned to version 0.5.1 and started with `npx -y @lightspot/mcp@0.5.1`. Its source is in this repository, in [`src/`](../src)
+- **An MCP server**, `@lightspot/mcp`, pinned to version 0.6.0 and started with `npx -y @lightspot/mcp@0.6.0`. Its source is in this repository, in [`src/`](../src)
 - **A skill**, `ai-visibility-audit`, that tells Claude how to run an audit and present the result as a prioritized plan
 
 ## Tools
@@ -36,7 +36,7 @@ Every tool declares whether it only reads or also writes, so Claude can ask befo
 
 ## What it downloads and sends
 
-- When the plugin starts, `npx` downloads `@lightspot/mcp@0.5.1` and its dependencies from the public npm registry
+- When the plugin starts, `npx` downloads `@lightspot/mcp@0.6.0` and its dependencies from the public npm registry
 - Each tool call sends an HTTPS request to the LightSpot API at `https://lightspot.ai/v1`, authenticated with your API key
 - When you run an audit, LightSpot's crawler fetches the URL you gave, and pages of the same site, with the user agent `LightSpot-Bot/1.0 (+https://lightspot.ai/bot)`
 - The plugin sends nothing to any other destination

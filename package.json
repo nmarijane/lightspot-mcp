@@ -1,7 +1,7 @@
 {
   "name": "@lightspot/mcp",
-  "version": "0.5.1",
-  "description": "MCP server for LightSpot.ai — run SEO & GEO audits, read results, and import editorial calendars.",
+  "version": "0.6.0",
+  "description": "MCP server for LightSpot.ai — run SEO and AI-visibility audits, read results, and import editorial calendars.",
   "type": "module",
   "bin": {
     "lightspot-mcp": "dist/index.js"
