@@ -1,7 +1,7 @@
 {
   "name": "lightspot",
   "displayName": "LightSpot",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "description": "Audit any website for SEO and AI search visibility (ChatGPT, Perplexity, Gemini, Google AI Overviews), then read the prioritized fixes, the experts' report and the competitors AI assistants cite instead.",
   "author": {
     "name": "LightSpot",

@@ -2,7 +2,7 @@
   "mcpServers": {
     "lightspot": {
       "command": "npx",
-      "args": ["-y", "@lightspot/mcp@0.5.1"],
+      "args": ["-y", "@lightspot/mcp@0.6.0"],
       "env": {
         "LIGHTSPOT_API_KEY": "${user_config.api_key}"
       }

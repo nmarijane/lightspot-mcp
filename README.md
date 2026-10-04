@@ -2,7 +2,7 @@
 
 [![M8ven Score](https://m8ven.ai/badge/mcp/nmarijane-lightspot-mcp-1m6lay)](https://m8ven.ai/mcp/nmarijane-lightspot-mcp-1m6lay?s=readme)
 
-MCP server for [LightSpot.ai](https://lightspot.ai) — run **SEO & GEO audits**, read their results and our experts' reports, and import editorial calendars from any MCP client (Claude Desktop, Claude Code, Cursor, …).
+MCP server for [LightSpot.ai](https://lightspot.ai) — run **SEO and AI-visibility audits**, read their results and our experts' reports, and import editorial calendars from any MCP client (Claude Desktop, Claude Code, Cursor, …).
 
 It wraps the LightSpot public API (`/v1`) as MCP tools, so an AI assistant can *"audit this site and tell me why ChatGPT doesn't cite it"* in one step.
 
@@ -56,7 +56,7 @@ The [`plugin/`](plugin) folder packages this server as a Claude plugin: it pins 
 | `get_site` | A site's metadata and recent audits. |
 | `list_site_audits` | A site's paginated audit history. |
 | `get_competitors` | Get a site's latest competitor analysis (detected competitors, tiers, citations, recommendations). Read-only — does not trigger a new analysis. Requires the Zenith plan. |
-| `get_expert_report` | Read the latest report from our 8 experts (technical SEO, content, GEO, structured data, sitemaps, performance, visual, brand authority) for a site or a given audit: prioritized findings, recommended actions with steps, limitations and ready-to-apply artifacts. Summary by default, `full: true` for everything, `expert` to read one chapter. Read-only — does not trigger an analysis. |
+| `get_expert_report` | Read the latest report from our 8 experts (technical SEO, content, AI visibility, structured data, sitemaps, performance, visual, brand authority) for a site or a given audit: prioritized findings, recommended actions with steps, limitations and ready-to-apply artifacts. Summary by default, `full: true` for everything, `expert` to read one chapter. Read-only — does not trigger an analysis. |
 | `get_editorial_calendar` | Read a site's calendar over an ISO date range, including imported slots and content already preparing, scheduled, or published. |
 | `create_editorial_calendar` | Import or update up to 50 dated editorial slots. Idempotent with `externalId`; it does not generate or publish content. |
 

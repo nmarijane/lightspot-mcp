@@ -1,6 +1,7 @@
 // Thin HTTP client for the LightSpot.ai public API (/v1/*). Mirrors the wire
 // shapes from the app's lib/api/serializers.ts. Auth is a Bearer API key
-// (lspai_live_…) created in the LightSpot dashboard (Business/Enterprise plans).
+// (lspai_live_…) created in the LightSpot dashboard (Eclat and Zenith plans), or an OAuth access token
+// when used by the remote connector.
 
 const DEFAULT_BASE = "https://lightspot.ai";
 
@@ -235,16 +236,15 @@ export type Paginated<T> = { data: T[]; total: number; limit: number; offset: nu
 
 // ─── Client ─────────────────────────────────────────────────────────────────
 
-const TERMINAL_STATUSES = new Set(["DONE", "FAILED"]);
-
-const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
-
 export class LightSpotClient {
   readonly base: string;
   private readonly key: string;
 
-  constructor(key: string, base?: string) {
+  private readonly mode: "api-key" | "oauth";
+
+  constructor(key: string, base?: string, mode: "api-key" | "oauth" = "api-key") {
     this.key = key;
+    this.mode = mode;
     this.base = (base && base.trim() ? base : DEFAULT_BASE).replace(/\/+$/, "");
   }
 
@@ -262,7 +262,7 @@ export class LightSpotClient {
       });
     } catch (e) {
       throw new LightSpotError(
-        `Impossible de joindre l'API LightSpot (${this.base}): ${e instanceof Error ? e.message : String(e)}`,
+        `Could not reach the LightSpot API (${this.base}): ${e instanceof Error ? e.message : String(e)}`,
         "network_error",
         0,
       );
@@ -281,8 +281,10 @@ export class LightSpotClient {
     if (!res.ok) {
       const err = (json as { error?: { code?: string; message?: string; retryAfter?: number } } | undefined)?.error;
       const code = err?.code ?? `http_${res.status}`;
-      const message = err?.message ?? this.friendly(res.status) ?? `Requête échouée (HTTP ${res.status}).`;
-      throw new LightSpotError(message, code, res.status, err?.retryAfter);
+      const message = err?.message ?? this.friendly(res.status) ?? `Request failed (HTTP ${res.status}).`;
+      const headerRetry = Number(res.headers?.get?.("Retry-After"));
+      const retryAfter = err?.retryAfter ?? (Number.isFinite(headerRetry) && headerRetry > 0 ? headerRetry : undefined);
+      throw new LightSpotError(message, code, res.status, retryAfter);
     }
 
     return json as T;
@@ -291,15 +293,15 @@ export class LightSpotClient {
   private friendly(status: number): string | undefined {
     switch (status) {
       case 401:
-        return "Clé API invalide ou révoquée. Vérifiez LIGHTSPOT_API_KEY (format lspai_live_…).";
-      case 403:
-        return "L'accès API/MCP est réservé aux plans Business et Enterprise.";
+        return this.mode === "oauth"
+          ? "Your LightSpot access token expired or was revoked. Retry the request; if it keeps failing, reconnect LightSpot in Claude."
+          : "Invalid or revoked API key. Check LIGHTSPOT_API_KEY (format lspai_live_…).";
       case 402:
-        return "Budget IA mensuel atteint — les audits sont en pause jusqu'au prochain cycle.";
+        return "Monthly AI budget reached — audits are paused until the next cycle.";
       case 404:
-        return "Ressource introuvable.";
+        return "Resource not found.";
       case 429:
-        return "Limite de requêtes atteinte. Réessayez dans un moment.";
+        return "Rate limit reached. Try again in a moment.";
       default:
         return undefined;
     }
@@ -373,23 +375,5 @@ export class LightSpotClient {
     return this.request("POST", `/v1/sites/${encodeURIComponent(id)}/editorial-calendar`, {
       items,
     });
-  }
-
-  /** Poll an audit until it reaches a terminal status (DONE/FAILED) or the timeout. */
-  async pollUntilDone(
-    id: string,
-    opts: { timeoutMs: number; intervalMs: number },
-  ): Promise<{ kind: "done"; audit: ApiAuditFull } | { kind: "timeout"; lastStatus: string }> {
-    const deadline = Date.now() + opts.timeoutMs;
-    let lastStatus = "PENDING";
-    while (Date.now() < deadline) {
-      const s = await this.getAuditStatus(id);
-      lastStatus = s.status;
-      if (TERMINAL_STATUSES.has(s.status)) {
-        return { kind: "done", audit: await this.getAudit(id) };
-      }
-      await sleep(opts.intervalMs);
-    }
-    return { kind: "timeout", lastStatus };
   }
 }
