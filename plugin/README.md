@@ -10,13 +10,12 @@ Ask Claude things like:
 
 ## Requirements
 
-- A LightSpot account on the **Eclat** or **Zenith** plan, which include API access
-- A LightSpot API key (`lspai_live_…`), created in **LightSpot → Integrations → API keys**. Claude asks for it when you enable the plugin and stores it in your system's secure credential store
-- Node.js 18 or later, used to run the server with `npx`
+- A LightSpot account with an active **Eclat**, **Halo** or **Zenith** subscription. First-time subscribers start with a 14-day free trial
+- Nothing to install and no API key to copy: the first time Claude uses the plugin, run `/mcp`, choose `lightspot` and **Authenticate**, then sign in to LightSpot in your browser and approve access
 
 ## What the plugin contains
 
-- **An MCP server**, `@lightspot/mcp`, pinned to version 0.6.0 and started with `npx -y @lightspot/mcp@0.6.0`. Its source is in this repository, in [`src/`](../src)
+- **A connection to LightSpot's hosted MCP server** at `https://mcp.lightspot.ai/mcp`, secured with OAuth. Nothing runs on your computer
 - **A skill**, `ai-visibility-audit`, that tells Claude how to run an audit and present the result as a prioritized plan
 
 ## Tools
@@ -27,17 +26,18 @@ Ask Claude things like:
 | `run_audit` | Starts an audit without waiting. Uses one audit from your quota |
 | `get_audit_status`, `get_audit` | Read an audit's progress and results |
 | `list_sites`, `get_site`, `list_site_audits` | Read your LightSpot sites and their audit history |
-| `get_competitors` | Reads the latest competitor analysis of a site (Zenith plan) |
+| `get_competitors` | Reads the latest competitor analysis of a site (Halo or Zenith plan) |
 | `get_expert_report` | Reads the latest report from LightSpot's experts |
 | `get_editorial_calendar` | Reads a site's editorial calendar |
 | `create_editorial_calendar` | Writes up to 50 planned content slots to a site's calendar. Re-importing a slot with the same `externalId` replaces it |
 
 Every tool declares whether it only reads or also writes, so Claude can ask before a tool changes anything.
 
-## What it downloads and sends
+## What it sends
 
-- When the plugin starts, `npx` downloads `@lightspot/mcp@0.6.0` and its dependencies from the public npm registry
-- Each tool call sends an HTTPS request to the LightSpot API at `https://lightspot.ai/v1`, authenticated with your API key
+- The plugin downloads and runs nothing on your computer
+- Sign-in happens on `https://lightspot.ai` in your browser. Claude stores the resulting access token and can be disconnected at any time from `/mcp`
+- Each tool call sends an HTTPS request to `https://mcp.lightspot.ai/mcp`, authenticated with that token
 - When you run an audit, LightSpot's crawler fetches the URL you gave, and pages of the same site, with the user agent `LightSpot-Bot/1.0 (+https://lightspot.ai/bot)`
 - The plugin sends nothing to any other destination
 
