@@ -1,7 +1,7 @@
 {
   "name": "lightspot",
   "displayName": "LightSpot",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Audit any website for SEO and AI search visibility (ChatGPT, Perplexity, Gemini, Google AI Overviews), then read the prioritized fixes, the experts' report and the competitors AI assistants cite instead.",
   "author": {
     "name": "LightSpot",
@@ -16,14 +16,5 @@
   "documentationUrl": "https://lightspot.ai/en/docs/api",
   "supportUrl": "https://lightspot.ai/en/support",
   "privacyPolicyUrl": "https://lightspot.ai/en/privacy",
-  "termsOfServiceUrl": "https://lightspot.ai/en/terms",
-  "userConfig": {
-    "api_key": {
-      "type": "string",
-      "title": "LightSpot API key",
-      "description": "Your LightSpot API key (lspai_live_…), created in LightSpot → Integrations → API keys. API access is included in the Eclat and Zenith plans.",
-      "sensitive": true,
-      "required": true
-    }
-  }
+  "termsOfServiceUrl": "https://lightspot.ai/en/terms"
 }
