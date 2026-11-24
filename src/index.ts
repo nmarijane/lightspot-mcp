@@ -25,13 +25,13 @@ const BASE_URL = process.env.LIGHTSPOT_BASE_URL;
 
 const client = API_KEY ? new LightSpotClient(API_KEY, BASE_URL, "api-key") : null;
 
-const server = new McpServer({ name: "lightspot", version: "0.6.0" });
+const server = new McpServer({ name: "lightspot", version: "0.7.0" });
 registerLightspotTools(
   server,
   () => {
     if (!client) {
       throw new Error(
-        "LIGHTSPOT_API_KEY is not set. Create a key in LightSpot → Integrations → API keys (Eclat and Zenith plans).",
+        "LIGHTSPOT_API_KEY is not set. Create a key in LightSpot → Integrations → API keys (Eclat, Halo and Zenith plans).",
       );
     }
     return client;

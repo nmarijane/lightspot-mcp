@@ -1,6 +1,6 @@
 // Thin HTTP client for the LightSpot.ai public API (/v1/*). Mirrors the wire
 // shapes from the app's lib/api/serializers.ts. Auth is a Bearer API key
-// (lspai_live_…) created in the LightSpot dashboard (Eclat and Zenith plans), or an OAuth access token
+// (lspai_live_…) created in the LightSpot dashboard (Eclat, Halo and Zenith plans), or an OAuth access token
 // when used by the remote connector.
 
 const DEFAULT_BASE = "https://lightspot.ai";

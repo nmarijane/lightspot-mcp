@@ -48,8 +48,8 @@ The [`plugin/`](plugin) folder is the Claude plugin. It connects Claude to Light
 
 | Tool | What it does |
 | --- | --- |
-| `audit_and_wait` | Run an audit on a URL, wait for it to finish, and return a summary (score, top actions, main issues). The one-shot "audit this and tell me what's wrong." |
-| `run_audit` | Start an audit without waiting (returns the audit id). |
+| `audit_and_wait` | Run an audit on a URL, wait for it to finish, and return a summary (score, top actions, main issues). The one-shot "audit this and tell me what's wrong." An audit of one of your sites is attached to it automatically (or pass `siteId`). |
+| `run_audit` | Start an audit without waiting (returns the audit id). Attached to your matching site the same way. |
 | `get_audit_status` | Lightweight status of an audit (`PENDING`/`RUNNING`/`DONE`/`FAILED` + progress 0–1). |
 | `get_audit` | Audit results — a trimmed summary by default, or the full payload with `full: true`. |
 | `list_sites` | List the sites in your team (with their latest score). |
@@ -72,7 +72,7 @@ The [`plugin/`](plugin) folder is the Claude plugin. It connects Claude to Light
 
 ## Notes
 
-- Quotas (audits/month, pages/audit) and per-key rate limits follow your LightSpot plan.
+- Quotas (audits/month, pages/audit) and per-key rate limits follow your LightSpot plan. Each site can be audited once per day.
 - Importing editorial slots does not consume AI credits and never generates, schedules, or publishes content automatically.
 - The full REST API reference lives at [lightspot.ai/docs/api](https://lightspot.ai/docs/api).
 

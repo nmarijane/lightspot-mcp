@@ -160,9 +160,36 @@ async function pollAudit(
   return { kind: "timeout", lastStatus };
 }
 
+// Site identity, same rule as siteIdentityKey in lib/sites.ts (host without
+// "www.", path without trailing slash). Duplicated: mcp/ ships alone on npm.
+function siteKey(url: string): string | null {
+  try {
+    const u = new URL(url.trim());
+    return `${u.hostname.toLowerCase().replace(/^www\./, "")}${u.pathname.replace(/\/+$/, "")}`;
+  } catch {
+    return null;
+  }
+}
+
+// An audit created without siteId stays out of the site's history and escapes
+// the "one audit per site per day" rule. When the audited URL is one of the
+// team's sites, attach it. Soft-fail: a failed lookup never blocks the audit.
+async function siteIdForUrl(c: LightSpotClient, url: string): Promise<string | undefined> {
+  const key = siteKey(url);
+  if (!key) return undefined;
+  try {
+    const { data } = await c.listSites({ limit: 100 });
+    return data.find((s) => siteKey(s.url) === key)?.id;
+  } catch {
+    return undefined;
+  }
+}
+
 // Tool annotations (title + readOnlyHint/destructiveHint): required by the
 // Claude connectors directory, and read by MCP clients to decide when to ask
-// for confirmation. Read-only = no side effect; audits write (they consume
+// for confirmation. The title is published twice, at the top level (MCP spec
+// 2025-06-18) and in annotations.title (earlier spec, the field the directory
+// portal checks). Read-only = no side effect; audits write (they consume
 // quota) and reach out to the web (openWorld); the calendar import is
 // idempotent but overwrites an existing slot with the same externalId
 // (destructive).
@@ -175,10 +202,11 @@ export function registerLightspotTools(
     "audit_and_wait",
     {
       title: "Audit a URL and wait for the result",
-      annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true },
+      annotations: { title: "Audit a URL and wait for the result", readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true },
       description:
         "Runs a LightSpot SEO and AI-visibility audit on a URL, waits for it to finish, and returns a summary (score, top actions, main issues). " +
-        'Ideal for "audit this site and tell me what to fix". Can take 1 to 3 minutes; past the time limit, it returns the id so you can follow up with get_audit_status / get_audit.',
+        'Ideal for "audit this site and tell me what to fix". Can take 1 to 3 minutes; past the time limit, it returns the id so you can follow up with get_audit_status / get_audit. ' +
+        "An audit of one of your sites appears in its history, and each site can be audited once per day.",
       inputSchema: {
         url: z.string().url().describe("URL to audit (home page or a specific page)."),
         maxPages: z
@@ -188,12 +216,16 @@ export function registerLightspotTools(
           .max(50)
           .optional()
           .describe("Number of pages to crawl (capped by your plan)."),
+        siteId: z
+          .string()
+          .optional()
+          .describe("Attach the audit to one of your sites (optional). When omitted, the audit is attached to your site with the same URL, if there is one."),
       },
     },
-    async ({ url, maxPages }) =>
+    async ({ url, maxPages, siteId }) =>
       run(async () => {
         const c = getClient();
-        const created = await c.createAudit({ url, maxPages });
+        const created = await c.createAudit({ url, maxPages, siteId: siteId ?? (await siteIdForUrl(c, url)) });
         let res: Awaited<ReturnType<typeof pollAudit>>;
         try {
           res = await pollAudit(c, created.id, opts.auditWaitTimeoutMs);
@@ -222,23 +254,31 @@ export function registerLightspotTools(
     "run_audit",
     {
       title: "Start an audit (non-blocking)",
-      annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true },
+      annotations: { title: "Start an audit (non-blocking)", readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true },
       description:
-        "Starts an SEO and AI-visibility audit on a URL without waiting. Returns the id and status. Use get_audit_status to follow progress and get_audit for the results.",
+        "Starts an SEO and AI-visibility audit on a URL without waiting. Returns the id and status. Use get_audit_status to follow progress and get_audit for the results. " +
+        "An audit of one of your sites appears in its history, and each site can be audited once per day.",
       inputSchema: {
         url: z.string().url().describe("URL to audit."),
         maxPages: z.number().int().min(1).max(50).optional().describe("Number of pages to crawl."),
-        siteId: z.string().optional().describe("Attach the audit to an existing site (optional)."),
+        siteId: z
+          .string()
+          .optional()
+          .describe("Attach the audit to one of your sites (optional). When omitted, the audit is attached to your site with the same URL, if there is one."),
       },
     },
-    async ({ url, maxPages, siteId }) => run(() => getClient().createAudit({ url, maxPages, siteId })),
+    async ({ url, maxPages, siteId }) =>
+      run(async () => {
+        const c = getClient();
+        return c.createAudit({ url, maxPages, siteId: siteId ?? (await siteIdForUrl(c, url)) });
+      }),
   );
 
   server.registerTool(
     "get_audit_status",
     {
       title: "Get audit status",
-      annotations: { readOnlyHint: true, openWorldHint: false },
+      annotations: { title: "Get audit status", readOnlyHint: true, openWorldHint: false },
       description: "Lightweight status of an audit (PENDING/RUNNING/DONE/FAILED) with a progress value from 0 to 1.",
       inputSchema: { id: z.string().describe("Audit identifier.") },
     },
@@ -249,7 +289,7 @@ export function registerLightspotTools(
     "get_audit",
     {
       title: "Get audit results",
-      annotations: { readOnlyHint: true, openWorldHint: false },
+      annotations: { title: "Get audit results", readOnlyHint: true, openWorldHint: false },
       description:
         "Fetches the results of an audit: a summary by default (score, top actions, main issues), or the full payload with full=true (all pages and all issues).",
       inputSchema: {
@@ -268,7 +308,7 @@ export function registerLightspotTools(
     "list_sites",
     {
       title: "List your sites",
-      annotations: { readOnlyHint: true, openWorldHint: false },
+      annotations: { title: "List your sites", readOnlyHint: true, openWorldHint: false },
       description: "Paginated list of your LightSpot team's sites (with their latest score).",
       inputSchema: {
         limit: z.number().int().min(1).max(100).optional().describe("Page size (default 50)."),
@@ -282,7 +322,7 @@ export function registerLightspotTools(
     "get_site",
     {
       title: "Get a site",
-      annotations: { readOnlyHint: true, openWorldHint: false },
+      annotations: { title: "Get a site", readOnlyHint: true, openWorldHint: false },
       description: "A site's metadata and its recent audits.",
       inputSchema: { id: z.string().describe("Site identifier.") },
     },
@@ -293,7 +333,7 @@ export function registerLightspotTools(
     "list_site_audits",
     {
       title: "List a site's audit history",
-      annotations: { readOnlyHint: true, openWorldHint: false },
+      annotations: { title: "List a site's audit history", readOnlyHint: true, openWorldHint: false },
       description: "Paginated audit history of a site.",
       inputSchema: {
         id: z.string().describe("Site identifier."),
@@ -308,9 +348,9 @@ export function registerLightspotTools(
     "get_competitors",
     {
       title: "Get a site's competitor analysis",
-      annotations: { readOnlyHint: true, openWorldHint: false },
+      annotations: { title: "Get a site's competitor analysis", readOnlyHint: true, openWorldHint: false },
       description:
-        "Fetches a site's latest existing competitor analysis (detected competitors, tiers, citations, recommendations). Requires the Zenith plan. " +
+        "Fetches a site's latest existing competitor analysis (detected competitors, tiers, citations, recommendations). Requires the Halo or Zenith plan. " +
         'Does NOT trigger a new analysis — if none has been started from the app yet, returns status: "NONE".',
       inputSchema: { siteId: z.string().describe("Site identifier.") },
     },
@@ -321,7 +361,7 @@ export function registerLightspotTools(
     "get_expert_report",
     {
       title: "Get a site's expert report",
-      annotations: { readOnlyHint: true, openWorldHint: false },
+      annotations: { title: "Get a site's expert report", readOnlyHint: true, openWorldHint: false },
       description:
         "Fetches the latest report from our 8 experts (technical SEO, editorial quality, AI visibility, structured data, sitemaps, performance, visual analysis, brand authority) produced after a site audit: " +
         "prioritized findings, recommended actions with their steps, limitations and ready-to-apply artifacts (JSON-LD, sitemap…). " +
@@ -354,7 +394,7 @@ export function registerLightspotTools(
     "get_editorial_calendar",
     {
       title: "Read a site's editorial calendar",
-      annotations: { readOnlyHint: true, openWorldHint: false },
+      annotations: { title: "Read a site's editorial calendar", readOnlyHint: true, openWorldHint: false },
       description:
         "Reads a site's LightSpot editorial calendar over a period: imported slots, content being prepared, scheduled or published, and upcoming autopilot runs.",
       inputSchema: {
@@ -370,7 +410,7 @@ export function registerLightspotTools(
     "create_editorial_calendar",
     {
       title: "Create or update an editorial calendar",
-      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: false },
+      annotations: { title: "Create or update an editorial calendar", readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: false },
       description:
         "Imports up to 50 dated editorial slots into a LightSpot site's calendar. " +
         "The import is idempotent: externalId lets you update a slot without creating a duplicate. " +

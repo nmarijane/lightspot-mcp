@@ -10,7 +10,7 @@ Ask Claude things like:
 
 ## Requirements
 
-- A LightSpot account with an active **Eclat**, **Halo** or **Zenith** subscription. First-time subscribers start with a 14-day free trial
+- A LightSpot account with an active **Eclat**, **Halo** or **Zenith** subscription. First-time Eclat subscribers start with a 7-day free trial
 - Nothing to install and no API key to copy: the first time Claude uses the plugin, run `/mcp`, choose `lightspot` and **Authenticate**, then sign in to LightSpot in your browser and approve access
 
 ## What the plugin contains
