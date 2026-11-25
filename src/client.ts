@@ -173,7 +173,7 @@ export type ApiExpertReport = {
   experts: ApiExpertChapter[];
 };
 
-export type EditorialPlatform = "LINKEDIN" | "REDDIT" | "X";
+export type EditorialPlatform = "LINKEDIN" | "X";
 
 export type EditorialCalendarItemInput = {
   externalId?: string;

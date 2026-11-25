@@ -429,8 +429,8 @@ export function registerLightspotTools(
               kind: z.enum(["SOCIAL", "ARTICLE"]).describe("Intended content type."),
               topic: z.string().min(1).max(300).describe("Slot topic or title."),
               platforms: z
-                .array(z.enum(["LINKEDIN", "REDDIT", "X"]))
-                .max(3)
+                .array(z.enum(["LINKEDIN", "X"]))
+                .max(2)
                 .optional()
                 .describe("Required for SOCIAL, empty or omitted for ARTICLE."),
               format: z
