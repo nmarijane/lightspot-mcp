@@ -67,7 +67,7 @@ The [`plugin/`](plugin) folder is the Claude plugin. It connects Claude to Light
 - "Get the full results for audit `<id>` and group the issues by severity."
 - "What competitors were detected for my site `<siteId>`, and what should I do about them?"
 - "Read the experts' report for my site `<siteId>` and fix what the structured-data expert recommends in my codebase."
-- "Create a four-week editorial calendar for my site `<siteId>` with two LinkedIn posts and one educational Reddit post per week, then import it into LightSpot."
+- "Create a four-week editorial calendar for my site `<siteId>` with two LinkedIn posts and one educational X thread per week, then import it into LightSpot."
 - "Show me everything planned or published for site `<siteId>` between 2026-08-01T00:00:00+02:00 and 2026-09-01T00:00:00+02:00."
 
 ## Notes
